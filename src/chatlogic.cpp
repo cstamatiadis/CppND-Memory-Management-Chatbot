@@ -52,6 +52,103 @@ ChatLogic::~ChatLogic()
     //// EOF STUDENT CODE
 }
 
+ChatLogic::ChatLogic(const ChatLogic &logic)
+{
+    std::cout << "COPYING content of instance " << &logic << " to instane " << this << std::endl;
+
+    for (auto it = std::begin(logic._nodes); it != std::end(logic._nodes); ++it)
+    {
+        GraphNode node = *(*it);
+        _nodes.push_back(std::make_unique<GraphNode> (node.GetID()));
+    }
+
+    _currentNode = logic._currentNode;
+    _chatBot = logic._chatBot;
+    _panelDialog = logic._panelDialog;
+}
+    
+ChatLogic& ChatLogic::operator=(const ChatLogic &logic)
+{
+    std::cout << "ASSIGNING content of instance " << &logic << " to instane " << this << std::endl;
+    
+    if (this == &logic)
+        return *this;
+
+    _currentNode = nullptr;
+    _chatBot = nullptr;
+    _panelDialog = nullptr;
+
+    _nodes.clear();
+    
+    for (auto it = std::begin(logic._nodes); it != std::end(logic._nodes); ++it)
+    {
+        GraphNode node = *(*it);
+        _nodes.push_back(std::make_unique<GraphNode> (node.GetID()));
+    }
+    
+    _currentNode = logic._currentNode;
+    _chatBot = logic._chatBot;
+    _panelDialog = logic._panelDialog;
+
+    return *this;
+}
+    
+ChatLogic::ChatLogic(ChatLogic &&logic)
+{
+    std::cout << "MOVING (constructor) content of instance " << &logic << " to instane " << this << std::endl;
+    
+    for (auto it = std::begin(logic._nodes); it != std::end(logic._nodes); ++it)
+    {
+        GraphNode node = *(*it);
+        _nodes.push_back(std::make_unique<GraphNode> (node.GetID()));
+
+        // std::unique_ptr<GraphNode> node = std::move(*it);
+        // _nodes.push_back(std::move(node));
+    }
+    
+    _currentNode = logic._currentNode;
+    _chatBot = logic._chatBot;
+    _panelDialog = logic._panelDialog;
+
+    logic._currentNode = nullptr;
+    logic._chatBot = nullptr;
+    logic._panelDialog = nullptr;
+}
+    
+ChatLogic & ChatLogic::operator=(ChatLogic &&logic)
+{
+    std::cout << "MOVING (assignment) content of instance " << &logic << " to instane " << this << std::endl;
+    
+    if (this == &logic)
+        return *this;
+    
+    _currentNode = nullptr;
+    _chatBot = nullptr;
+    _panelDialog = nullptr;
+
+    _nodes.clear();
+
+    for (auto it = std::begin(logic._nodes); it != std::end(logic._nodes); ++it)
+    {
+        GraphNode node = *(*it);
+        _nodes.push_back(std::make_unique<GraphNode> (node.GetID()));
+
+        // std::unique_ptr<GraphNode> node = std::move(*it);
+        // _nodes.push_back(std::move(node));
+    }
+
+    _currentNode = logic._currentNode;
+    _chatBot = logic._chatBot;
+    _panelDialog = logic._panelDialog;
+
+    logic._currentNode = nullptr;
+    logic._chatBot = nullptr;
+    logic._panelDialog = nullptr;
+
+    return *this;
+}
+
+
 template <typename T>
 void ChatLogic::AddAllTokensToElement(std::string tokenID, tokenlist &tokens, T &element)
 {
@@ -163,8 +260,9 @@ void ChatLogic::LoadAnswerGraphFromFile(std::string filename)
 
                             // create new edge
                             GraphEdge *edge = new GraphEdge(id);
-                            edge->SetChildNode(*childNode);
-                            edge->SetParentNode(*parentNode);
+                            // need to access the raw pointer
+                            edge->SetChildNode((*childNode).get());
+                            edge->SetParentNode((*parentNode).get());
                             _edges.push_back(edge);
 
                             // find all keywords for current node
@@ -203,12 +301,12 @@ void ChatLogic::LoadAnswerGraphFromFile(std::string filename)
     for (auto it = std::begin(_nodes); it != std::end(_nodes); ++it)
     {
         // search for nodes which have no incoming edges
-        if ((it.get())->GetNumberOfParents() == 0)
+        if ((*it)->GetNumberOfParents() == 0)
         {
 
             if (rootNode == nullptr)
             {
-                rootNode = it.get(); // assign current node to root
+                rootNode = (*it).get(); // assign current node to root
             }
             else
             {

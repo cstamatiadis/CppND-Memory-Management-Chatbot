@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <memory.h>
 #include "chatgui.h"
 
 // forward declarations
@@ -41,6 +42,13 @@ public:
     // constructor / destructor
     ChatLogic();
     ~ChatLogic();
+
+    // not sure if we actually need this --> some people claim there issues were solved by using the
+    // rule of 5 
+    ChatLogic(const ChatLogic &logic);
+    ChatLogic &operator=(const ChatLogic &logic);
+    ChatLogic(ChatLogic &&logic);
+    ChatLogic &operator=(ChatLogic &&logic);
 
     // getter / setter
     void SetPanelDialogHandle(ChatBotPanelDialog *panelDialog);
