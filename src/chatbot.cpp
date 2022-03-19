@@ -44,7 +44,83 @@ ChatBot::~ChatBot()
 
 //// STUDENT CODE
 ////
+// copy constructor
+ChatBot::ChatBot(const ChatBot &chatbot)
+{
+    *_chatLogic = *chatbot._chatLogic;
+    *_rootNode = *chatbot._rootNode;
+    *_currentNode = *chatbot._currentNode;
+    if (chatbot._image != nullptr) 
+    {
+        _image = new wxBitmap();
+        *_image = *chatbot._image;
+    }
+    else{
+        _image = nullptr;
+    }
 
+
+    std::cout << "COPYING content of instance " << &chatbot << " to instance " << this << std::endl;
+}
+
+// assignment operator
+ChatBot& ChatBot::operator=(const ChatBot &chatbot)
+{
+    std::cout << "ASSIGNING content of instance " << &chatbot << " to instance " << this << std::endl;
+    if (this == &chatbot)
+        return *this;
+    if(_image != nullptr){
+        delete _image;
+        _image = nullptr;
+    }
+
+    if(chatbot._image != nullptr)
+    {
+        _image = new wxBitmap(*chatbot._image);
+    }
+    
+    *_currentNode = *chatbot._currentNode; 
+    *_chatLogic = *chatbot._chatLogic;
+    *_rootNode = *chatbot._rootNode;
+
+    return *this;
+}
+ChatBot::ChatBot (ChatBot &&chatbot)
+{
+    std::cout << "MOVING (c’tor) instance " << &chatbot << " to instance " << this << std::endl;
+    _image = chatbot._image;
+    _currentNode = chatbot._currentNode; 
+    _chatLogic = chatbot._chatLogic;
+    _rootNode = chatbot._rootNode;
+
+    chatbot._image= nullptr;
+    chatbot._currentNode= nullptr; 
+    chatbot._chatLogic= nullptr;
+    chatbot._rootNode= nullptr;
+}
+ChatBot& ChatBot::operator=(ChatBot &&chatbot)
+{
+    std::cout << "MOVING (assign) instance " << &chatbot << " to instance " << this << std::endl;
+    if (this == &chatbot)
+        return *this;
+
+    if(_image != nullptr){
+        delete _image;
+        _image = nullptr;
+    }
+
+    _image = chatbot._image;
+    _currentNode = chatbot._currentNode; 
+    _chatLogic = chatbot._chatLogic;
+    _rootNode = chatbot._rootNode;
+
+    chatbot._image= nullptr;
+    chatbot._currentNode= nullptr; 
+    chatbot._chatLogic= nullptr;
+    chatbot._rootNode= nullptr;
+
+    return *this;
+}
 ////
 //// EOF STUDENT CODE
 
