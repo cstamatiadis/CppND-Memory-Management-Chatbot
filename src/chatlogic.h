@@ -21,7 +21,8 @@ private:
     // std::vector<GraphNode *> _nodes;
     // as beforer to achieve unique ownership, we use a unique pointer
     std::vector<std::unique_ptr <GraphNode >> _nodes;
-    std::vector<GraphEdge *> _edges;
+    // remove since it should not be owned by the chatlogic anymore
+    // std::vector<GraphEdge *> _edges;
 
     ////
     //// EOF STUDENT CODE
