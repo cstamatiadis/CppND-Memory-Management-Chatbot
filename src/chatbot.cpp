@@ -47,19 +47,18 @@ ChatBot::~ChatBot()
 // copy constructor
 ChatBot::ChatBot(const ChatBot &chatbot)
 {
-    *_chatLogic = *chatbot._chatLogic;
-    *_rootNode = *chatbot._rootNode;
-    *_currentNode = *chatbot._currentNode;
-    if (chatbot._image != nullptr) 
-    {
-        _image = new wxBitmap();
-        *_image = *chatbot._image;
-    }
-    else{
+    _chatLogic = chatbot._chatLogic;
+    _rootNode = chatbot._rootNode;
+    _currentNode = chatbot._currentNode;
+    if(_image!= nullptr){
+        delete _image;
         _image = nullptr;
     }
-
-
+    if (chatbot._image != nullptr) 
+    {
+        _image = new wxBitmap(*chatbot._image);
+    }
+    _chatLogic->SetChatbotHandle(this);
     std::cout << "COPYING content of instance " << &chatbot << " to instance " << this << std::endl;
 }
 
@@ -77,12 +76,13 @@ ChatBot& ChatBot::operator=(const ChatBot &chatbot)
     if(chatbot._image != nullptr)
     {
         _image = new wxBitmap(*chatbot._image);
+        // chatbot._image = nullptr;
     }
     
-    *_currentNode = *chatbot._currentNode; 
-    *_chatLogic = *chatbot._chatLogic;
-    *_rootNode = *chatbot._rootNode;
-
+    _currentNode = chatbot._currentNode; 
+    _chatLogic = chatbot._chatLogic;
+    _rootNode = chatbot._rootNode;
+    _chatLogic->SetChatbotHandle(this);
     return *this;
 }
 ChatBot::ChatBot (ChatBot &&chatbot)
@@ -97,6 +97,7 @@ ChatBot::ChatBot (ChatBot &&chatbot)
     chatbot._currentNode= nullptr; 
     chatbot._chatLogic= nullptr;
     chatbot._rootNode= nullptr;
+    _chatLogic->SetChatbotHandle(this);
 }
 ChatBot& ChatBot::operator=(ChatBot &&chatbot)
 {
@@ -118,7 +119,7 @@ ChatBot& ChatBot::operator=(ChatBot &&chatbot)
     chatbot._currentNode= nullptr; 
     chatbot._chatLogic= nullptr;
     chatbot._rootNode= nullptr;
-
+    _chatLogic->SetChatbotHandle(this);
     return *this;
 }
 ////
